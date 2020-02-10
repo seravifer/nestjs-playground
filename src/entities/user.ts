@@ -6,22 +6,28 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     userId: string;
 
-    @Column()
+    @Column('varchar')
     firstName: string;
 
-    @Column()
+    @Column('varchar')
     lastName: string;
 
-    @Column()
+    @Column('date')
     birthdate: string;
 
-    @Column()
-    phone: number;
+    @Column('integer')
+    phone?: number;
 
-    @Column()
+    @Column('varchar')
     password: string;
 
-    @Column()
+    @Column('boolean')
+    activated: boolean;
+
+    @Column('varchar')
     email: string;
+
+    @Column('uuid')
+    activationCode?: string;
 
 }

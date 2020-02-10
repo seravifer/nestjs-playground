@@ -1,32 +1,46 @@
-import { Controller, Post, Req, Res, Logger } from '@nestjs/common';
+import { Controller, Post, Req, Res, HttpCode } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { EmailService } from '../services/email.service';
 
 @Controller()
 export class AuthController {
 
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly jwtService: JwtService
   ) { }
 
   @Post('register')
-  create(@Req() req: Request, @Res() res: Response) {
-    this.authService.register(req.body).then(() => {
-      res.status(201).send();
-    }).catch(error => {
-      Logger.warn(error, 'AuthController');
-      res.status(400).send({ errorCode: error });
-    });
+  @HttpCode(201)
+  async create(@Req() req: Request) {
+    const user = await this.authService.register(req.body);
+    this.emailService.sendVerificationCode(user).catch(e => console.log(e))
+    return {};
   }
 
   @Post('login')
-  authenticate(@Req() req: Request, @Res() res: Response) {
-    this.authService.login(req.body)
-      .then(result => {
-        return res.status(200).send(result);
-      }).catch(error => {
-        return res.status(401).send({ errorCode: error });
-      });
+  @HttpCode(200)
+  async authenticate(@Req() req: Request) {
+    const userId = await this.authService.login(req.body);
+    return {
+      userId: userId,
+      token: this.jwtService.sign({ user_id: userId })
+    };
   }
+
+  @Post('reset_password')
+  resetPassword(@Req() req: Request, @Res() res: Response) {}
+
+  @Post('verify_email')
+  verifyEmail(@Req() req: Request, @Res() res: Response) {}
+
+  @Post('resend_email')
+  resendEmail(@Req() req: Request, @Res() res: Response) {}
+
+  @Post('refresh_token')
+  refreshToken(@Req() req: Request, @Res() res: Response) {}
 
 }

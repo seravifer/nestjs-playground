@@ -1,21 +1,49 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { JwtModuleOptions } from "@nestjs/jwt";
 
-export const DBConfig: TypeOrmModuleOptions = {
-  type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "postgres",
-  password: "pass",
-  database: "db",
-  entities: ["dist/models/*{.ts,.js}"]
-};
-
-export const passwordSecret: string = 'secret';
-
-export const JWTConfig = {
-  secret: 'secret',
-  signOptions: {
-    expiresIn: 3600,
+interface Config {
+  version: number;
+  port: number;
+  database: TypeOrmModuleOptions;
+  smtp: {
+    host: string;
+    port: number;
+    user: string;
+    pass: string;
+    mail: string;
+  };
+  session: {
+    passwordSecret: string;
+    jwtConfig: JwtModuleOptions;
   }
-} as JwtModuleOptions;
+}
+
+export const config: Config = {
+  version: 1,
+  port: parseInt(process.env.APP_PORT, 10) || 3000,
+  database: {
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    username: "postgres",
+    password: "pass",
+    database: "db",
+    entities: ["dist/entities/*{.ts,.js}"]
+  },
+  smtp: {
+    host: '',
+    port: 0,
+    user: '',
+    pass: '',
+    mail: '',
+  },
+  session: {
+    passwordSecret: 'secret',
+    jwtConfig: {
+      secret: 'secret',
+      signOptions: {
+        expiresIn: 3600,
+      }
+    }
+  }
+}

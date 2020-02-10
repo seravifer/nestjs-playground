@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { User } from '../models/user';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { User } from '../entities/user';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import * as moment from 'moment';
+import bcrypt from 'bcrypt';
+import moment from 'moment';
 
 @Injectable()
 export class AuthService {
@@ -11,39 +11,38 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async register(user: any) {
-    if(!user.firstName || !user.lastName || !user.birthdate || !user.password || !user.email) {
-      return Promise.reject('REQUIRED');
+  async register(data: any) {
+    if(!data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
+      throw new BadRequestException('REQUIRED');
     }
 
-    const isValidDate = moment(user.birthdate, 'DD/MM/YYYY').isValid();
-    if (!isValidDate) return Promise.reject('INVALID_DATE');
+    const isValidDate = moment(data.birthdate, 'DD/MM/YYYY').isValid();
+    if (!isValidDate) throw new BadRequestException('INVALID_DATE');
 
-    const exist = await User.findOne({ email: user.email });
-    if (exist) return Promise.reject('USER_ALREADY_EXIST');
+    const exist = await User.findOne({ email: data.email });
+    if (exist) throw new BadRequestException('USER_ALREADY_EXIST');
 
-    user.password = bcrypt.hashSync(user.password, 8);
+    data.password = bcrypt.hashSync(data.password, 8);
 
-    return await User.save<User>(user).catch(error => {
+    const user = await User.save(data).catch(error => {
       Logger.warn('Register user on DB fail!');
-      return Promise.reject('BAD_REQUEST');
+      throw new BadRequestException();
     });
+
+    return user;
   }
 
   async login(authData: { email: string, password: string }) {
     if (!authData.email || !authData.password) {
-      return Promise.reject('BAD_REQUEST');
+      throw new BadRequestException();
     }
 
     const user = await User.findOne({ email: authData.email });
     if (user && bcrypt.compareSync(authData.password, user.password)) {
-      return {
-        userId: user.userId,
-        jwt: this.jwtService.sign({ user_id: user.userId })
-      };
-    } else {
-      return Promise.reject('AUTHENTICATION_FAIL');
+      return user.userId;
     }
+    
+    throw new BadRequestException('AUTHENTICATION_FAIL');
   }
   
 }
