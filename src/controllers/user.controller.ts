@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('user')
 @UseGuards(AuthGuard())
 export class UserController {
-
+  
   constructor() {}
 
   @Get('me')
@@ -14,5 +14,4 @@ export class UserController {
     delete user['password'];
     res.status(200).send(req.user);
   }
-
-} 
+}

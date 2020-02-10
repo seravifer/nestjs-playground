@@ -1,18 +1,22 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { getConnection } from 'typeorm';
 import { User } from '../entities/user';
-import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import moment from 'moment';
 
 @Injectable()
 export class AuthService {
 
-  constructor(
-    private readonly jwtService: JwtService
-  ) {}
+  constructor() {}
 
   async register(data: any) {
-    if(!data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
+    if (
+      !data.firstName ||
+      !data.lastName ||
+      !data.birthdate ||
+      !data.password ||
+      !data.email
+    ) {
       throw new BadRequestException('REQUIRED');
     }
 
@@ -32,7 +36,7 @@ export class AuthService {
     return user;
   }
 
-  async login(authData: { email: string, password: string }) {
+  async login(authData: { email: string; password: string }) {
     if (!authData.email || !authData.password) {
       throw new BadRequestException();
     }
@@ -41,8 +45,30 @@ export class AuthService {
     if (user && bcrypt.compareSync(authData.password, user.password)) {
       return user.userId;
     }
-    
+
     throw new BadRequestException('AUTHENTICATION_FAIL');
   }
-  
+
+  async verify(userId: string, token: string) {
+    if (!userId || !token) {
+      throw new BadRequestException();
+    }
+
+    const user = await User.findOne({ userId });
+    if (!user) throw new BadRequestException();
+
+    if (user.activated) {
+      throw new BadRequestException();
+    }
+
+    if (user.activationCode === token) {
+      await getConnection()
+        .createQueryBuilder()
+        .update(User)
+        .set({ activated: true })
+        .where('userId = :userId', { userId: user.userId })
+        .execute();
+      return true;
+    }
+  }
 }
