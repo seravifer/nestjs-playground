@@ -105,6 +105,41 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "/verify_email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"test2@test.com\",\n\t\"token\": \"c9b6313e-78ec-4d11-9165-30fd221438cc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/verify_email",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"verify_email"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -147,6 +182,25 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "/health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/api/health",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"health"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -173,7 +227,7 @@
 	],
 	"variable": [
 		{
-			"id": "5c3852b2-54b6-4587-a1a2-71540e1a5f77",
+			"id": "7ff69b27-580e-49d3-acc4-441fa6ef6a92",
 			"key": "jwt",
 			"value": "",
 			"type": "string"
