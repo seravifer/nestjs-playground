@@ -7,10 +7,10 @@ import moment from 'moment';
 @Injectable()
 export class AuthService {
 
-  constructor() {}
+  constructor() { }
 
   async register(data: any) {
-    if ( !data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
+    if (!data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
       throw new BadRequestException('REQUIRED');
     }
 
@@ -43,27 +43,28 @@ export class AuthService {
     throw new BadRequestException('AUTHENTICATION_FAIL');
   }
 
-  async verify(userId: string, token: string) {
-    if (!userId || !token) {
+  async verify(email: string, token: string) {
+    if (!email || !token) {
       throw new BadRequestException();
     }
 
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ email });
     if (!user) throw new BadRequestException();
 
     if (user.activated) {
+      throw new BadRequestException('ALREADY_ACTIVATED');
+    }
+
+    if (user.activationCode !== token) {
       throw new BadRequestException();
     }
 
-    if (user.activationCode === token) {
-      await getConnection()
-        .createQueryBuilder()
-        .update(User)
-        .set({ activated: true })
-        .where('userId = :userId', { userId: user.userId })
-        .execute();
-      return true;
-    }
+    await getConnection()
+      .createQueryBuilder()
+      .update(User)
+      .set({ activated: true })
+      .where('userId = :userId', { userId: user.userId })
+      .execute();
   }
 
 }

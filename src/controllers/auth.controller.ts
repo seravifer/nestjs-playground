@@ -19,7 +19,7 @@ export class AuthController {
   @HttpCode(201)
   async create(@Req() req: Request) {
     const user = await this.authService.register(req.body);
-    this.emailService.sendVerificationCode(user).catch(e => console.log(e));
+    this.emailService.sendVerificationCode(user).catch(e => {});
     return {};
   }
 
@@ -43,8 +43,9 @@ export class AuthController {
   }
 
   @Post('verify_email')
-  verifyEmail(@Param() params: any) {
-    return this.authService.verify(params.userId, params.token);
+  @HttpCode(200)
+  verifyEmail(@Req() req: Request) {
+    return this.authService.verify(req.body.email, req.body.token);
   }
 
   @Post('resend_email')

@@ -26,6 +26,7 @@ export class EmailService {
 
   async sendVerificationCode(user: User) {
     const emailToken = v4();
+    Logger.log(`User token is: ${emailToken}`);
     // Save email token
     await getConnection()
       .createQueryBuilder()
@@ -39,6 +40,5 @@ export class EmailService {
       subject: 'Welcome!',
       text: `Your toke is: ${emailToken}`,
     });
-    Logger.log(`User token is: ${emailToken}`);
   }
 }
