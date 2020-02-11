@@ -10,13 +10,7 @@ export class AuthService {
   constructor() {}
 
   async register(data: any) {
-    if (
-      !data.firstName ||
-      !data.lastName ||
-      !data.birthdate ||
-      !data.password ||
-      !data.email
-    ) {
+    if ( !data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
       throw new BadRequestException('REQUIRED');
     }
 
@@ -71,4 +65,5 @@ export class AuthService {
       return true;
     }
   }
+
 }

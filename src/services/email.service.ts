@@ -3,7 +3,7 @@ import { createTransport, SendMailOptions } from 'nodemailer';
 import { User } from '../entities/user';
 import { getConnection } from 'typeorm';
 import { config } from '../config';
-import uuidv4 from 'uuid/v4';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class EmailService {
@@ -25,7 +25,7 @@ export class EmailService {
   }
 
   async sendVerificationCode(user: User) {
-    const emailToken = uuidv4();
+    const emailToken = v4();
     // Save email token
     await getConnection()
       .createQueryBuilder()

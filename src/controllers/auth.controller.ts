@@ -1,16 +1,19 @@
-import { Controller, Post, Req, Res, HttpCode, Param } from '@nestjs/common';
+import { Controller, Post, Req, Res, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from '../entities/user';
 
 @Controller()
 export class AuthController {
+
   constructor(
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService
-  ) {}
+  ) { }
 
   @Post('register')
   @HttpCode(201)
@@ -31,7 +34,13 @@ export class AuthController {
   }
 
   @Post('reset_password')
-  resetPassword(@Req() req: Request, @Res() res: Response) {}
+  async resetPassword(@Param() params: any) {
+    const user = await User.findOne({ userId: params.userId });
+    if (user) {
+      this.emailService.sendVerificationCode(user);
+    }
+    return {};
+  }
 
   @Post('verify_email')
   verifyEmail(@Param() params: any) {
@@ -39,8 +48,20 @@ export class AuthController {
   }
 
   @Post('resend_email')
-  resendEmail(@Req() req: Request, @Res() res: Response) {}
+  resendEmail(@Req() req: Request, @Res() res: Response) {
+    // TODO
+  }
 
-  @Post('refresh_token')
-  refreshToken(@Req() req: Request, @Res() res: Response) {}
+  @Post('new_password')
+  newPassword(@Req() req: Request, @Res() res: Response) {
+    // TODO
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('refresh_token')
+  async refreshToken(@Req() req: Request) {
+    return {
+      token: this.jwtService.sign({ user_id: (req.user as User).userId }),
+    };
+  }
 }

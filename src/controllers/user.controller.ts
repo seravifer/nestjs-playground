@@ -1,6 +1,7 @@
-import { Controller, Req, Get, UseGuards, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Req, Get, UseGuards, HttpCode } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from '../entities/user';
 
 @Controller('user')
 @UseGuards(AuthGuard())
@@ -9,9 +10,15 @@ export class UserController {
   constructor() {}
 
   @Get('me')
-  authenticate(@Req() req: Request, @Res() res: Response) {
-    const user = req.user;
-    delete user['password'];
-    res.status(200).send(req.user);
+  @HttpCode(200)
+  authenticate(@Req() req: Request) {
+    const user = req.user as User;
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      birthdate: user.birthdate,
+      phone: user.phone,
+      email: user.email
+    };
   }
 }
