@@ -49,7 +49,9 @@ export class AuthService {
     }
 
     const user = await User.findOne({ email });
-    if (!user) throw new BadRequestException();
+    if (!user) {
+      throw new BadRequestException();
+    }
 
     if (user.activated) {
       throw new BadRequestException('ALREADY_ACTIVATED');
@@ -62,7 +64,7 @@ export class AuthService {
     await getConnection()
       .createQueryBuilder()
       .update(User)
-      .set({ activated: true })
+      .set({ activated: true, activationCode: null })
       .where('userId = :userId', { userId: user.userId })
       .execute();
   }
