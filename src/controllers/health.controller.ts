@@ -4,8 +4,6 @@ import { getConnection } from 'typeorm';
 @Controller('health')
 export class HealthController {
 
-  constructor() { }
-
   @Get()
   async checkHealth() {
     let dbStatus: boolean;

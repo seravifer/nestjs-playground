@@ -6,8 +6,6 @@ import { User } from '../entities/user';
 @Controller('user')
 @UseGuards(AuthGuard())
 export class UserController {
-  
-  constructor() {}
 
   @Get('me')
   @HttpCode(200)

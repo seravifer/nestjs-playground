@@ -8,8 +8,6 @@ import { v4 } from 'uuid';
 @Injectable()
 export class EmailService {
 
-  constructor() {}
-
   sendMail(options: SendMailOptions) {
     const transporter = createTransport({
       host: config.smtp.host,

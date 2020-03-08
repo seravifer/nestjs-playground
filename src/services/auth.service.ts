@@ -7,8 +7,6 @@ import moment from 'moment';
 @Injectable()
 export class AuthService {
 
-  constructor() { }
-
   async register(data: any) {
     if (!data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
       throw new BadRequestException('REQUIRED');
@@ -22,7 +20,7 @@ export class AuthService {
 
     data.password = bcrypt.hashSync(data.password, 8);
 
-    const user = await User.save(data).catch(error => {
+    const user = await User.save(data).catch(() => {
       Logger.warn('Register user on DB fail!');
       throw new BadRequestException();
     });

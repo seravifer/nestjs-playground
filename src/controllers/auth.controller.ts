@@ -19,7 +19,7 @@ export class AuthController {
   @HttpCode(201)
   async create(@Req() req: Request) {
     const user = await this.authService.register(req.body);
-    this.emailService.sendVerificationCode(user).catch(e => {});
+    this.emailService.sendVerificationCode(user);
     return {};
   }
 
@@ -29,7 +29,7 @@ export class AuthController {
     const userId = await this.authService.login(req.body);
     return {
       userId: userId,
-      token: this.jwtService.sign({ user_id: userId }),
+      token: this.jwtService.sign({ userId }),
     };
   }
 
@@ -62,7 +62,7 @@ export class AuthController {
   @Get('refresh_token')
   async refreshToken(@Req() req: Request) {
     return {
-      token: this.jwtService.sign({ user_id: (req.user as User).userId }),
+      token: this.jwtService.sign({ userId: (req.user as User).userId }),
     };
   }
 }
