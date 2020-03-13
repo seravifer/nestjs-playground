@@ -22,7 +22,7 @@ interface Config {
 export const config: Config = {
   projectName: 'Server Test',
   version: 1,
-  port: parseInt(process.env.APP_PORT, 10) || 3000,
+  port: parseInt(process.env.SERVER_PORT, 10) || 3000,
   database: {
     type: 'postgres',
     host: 'localhost',
