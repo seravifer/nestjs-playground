@@ -1,5 +1,5 @@
-import { Controller, Post, Req, Res, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Post, Req, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
@@ -29,11 +29,12 @@ export class AuthController {
     const userId = await this.authService.login(req.body);
     return {
       userId: userId,
-      token: this.jwtService.sign({ userId }),
+      token: this.jwtService.sign({ userId })
     };
   }
 
   @Post('reset_password')
+  @HttpCode(200)
   async resetPassword(@Param() params: any) {
     const user = await User.findOne({ userId: params.userId });
     if (user) {
@@ -44,25 +45,27 @@ export class AuthController {
 
   @Post('verify_email')
   @HttpCode(200)
-  verifyEmail(@Req() req: Request) {
-    return this.authService.verify(req.body.email, req.body.token);
-  }
-
-  @Post('resend_email')
-  resendEmail(@Req() req: Request, @Res() res: Response) {
-    // TODO
+  async verifyEmail(@Req() req: Request) {
+    await this.authService.verify(req.body.email, req.body.token);
+    return {};
   }
 
   @Post('new_password')
-  newPassword(@Req() req: Request, @Res() res: Response) {
-    // TODO
+  @HttpCode(200)
+  async newPassword(@Req() req: Request) {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      this.emailService.sendRecoveryCode(user);
+    }
+    return {};
   }
 
   @UseGuards(AuthGuard())
   @Get('refresh_token')
+  @HttpCode(200)
   async refreshToken(@Req() req: Request) {
     return {
-      token: this.jwtService.sign({ userId: (req.user as User).userId }),
+      token: this.jwtService.sign({ userId: (req.user as User).userId })
     };
   }
 }

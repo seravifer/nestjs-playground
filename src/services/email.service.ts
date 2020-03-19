@@ -12,7 +12,7 @@ export class EmailService {
     const transporter = createTransport({
       host: config.smtp.host,
       port: config.smtp.port,
-      secure: true,
+      secure: config.smtp.secure,
       auth: {
         user: config.smtp.user,
         pass: config.smtp.pass,
@@ -36,6 +36,24 @@ export class EmailService {
     await this.sendMail({
       to: user.email,
       subject: 'Welcome!',
+      text: `Your toke is: ${emailToken}`,
+    });
+  }
+
+  async sendRecoveryCode(user: User) {
+    const emailToken = v4();
+    Logger.log(`User token is: ${emailToken}`);
+    // Save email token
+    await getConnection()
+      .createQueryBuilder()
+      .update(User)
+      .set({ activationCode: emailToken })
+      .where('userId = :userId', { userId: user.userId })
+      .execute();
+    // Send email
+    await this.sendMail({
+      to: user.email,
+      subject: 'Recovery!',
       text: `Your toke is: ${emailToken}`,
     });
   }

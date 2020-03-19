@@ -9,6 +9,7 @@ interface Config {
   smtp: {
     host: string;
     port: number;
+    secure: boolean;
     user: string;
     pass: string;
     mail: string;
@@ -22,7 +23,7 @@ interface Config {
 export const config: Config = {
   projectName: 'Server Test',
   version: 1,
-  port: parseInt(process.env.SERVER_PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 3000,
   database: {
     type: 'postgres',
     host: 'localhost',
@@ -33,11 +34,12 @@ export const config: Config = {
     entities: ['dist/entities/*{.ts,.js}'],
   },
   smtp: {
-    host: '',
-    port: 0,
-    user: '',
-    pass: '',
-    mail: '',
+    host: 'localhost',
+    port: 1025,
+    secure: false,
+    user: 'project.1',
+    pass: 'secret.1',
+    mail: 'noreply@mail.com'
   },
   session: {
     passwordSecret: 'secret',
