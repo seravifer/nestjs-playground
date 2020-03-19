@@ -1,10 +1,12 @@
-import { Controller, Post, Req, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode, Param, Get, UseGuards, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
+import bcrypt from 'bcrypt';
+import { getConnection } from 'typeorm';
 
 @Controller()
 export class AuthController {
@@ -67,5 +69,18 @@ export class AuthController {
     return {
       token: this.jwtService.sign({ userId: (req.user as User).userId })
     };
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('change_password')
+  @HttpCode(200)
+  async changePassword(@Req() req: Request) {
+    await this.authService.changePassword(
+      req.body.old_password,
+      req.body.new_password,
+      req.user as User
+    );
+
+    return {};
   }
 }

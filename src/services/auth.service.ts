@@ -41,6 +41,25 @@ export class AuthService {
     throw new BadRequestException('AUTHENTICATION_FAIL');
   }
 
+  async changePassword(oldPassword: string, newPassword: string, user: User) {
+    if (oldPassword == newPassword) {
+      throw new BadRequestException('SAME_PASSWORD');
+    }
+
+    if (!bcrypt.compareSync(oldPassword, user.password)) {
+      throw new BadRequestException('INVALID_PASSWORD');
+    }
+
+    await getConnection()
+      .createQueryBuilder()
+      .update(User)
+      .set({ password: bcrypt.hashSync(newPassword, 8) })
+      .where('userId = :userId', { userId: user.userId })
+      .execute();
+
+    return {}
+  }
+
   async verify(email: string, token: string) {
     if (!email || !token) {
       throw new BadRequestException();
