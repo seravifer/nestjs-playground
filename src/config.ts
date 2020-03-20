@@ -14,10 +14,7 @@ interface Config {
     pass: string;
     mail: string;
   };
-  session: {
-    passwordSecret: string;
-    jwtConfig: JwtModuleOptions;
-  };
+  jwt: JwtModuleOptions;
 }
 
 export const config: Config = {
@@ -41,13 +38,10 @@ export const config: Config = {
     pass: 'secret.1',
     mail: 'noreply@mail.com'
   },
-  session: {
-    passwordSecret: 'secret',
-    jwtConfig: {
-      secret: 'secret',
-      signOptions: {
-        expiresIn: 3600,
-      }
+  jwt: {
+    secret: 'secret',
+    signOptions: {
+      expiresIn: 3600,
     }
   }
 };
