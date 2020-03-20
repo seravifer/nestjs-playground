@@ -1,12 +1,10 @@
-import { Controller, Post, Req, HttpCode, Param, Get, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
-import bcrypt from 'bcrypt';
-import { getConnection } from 'typeorm';
 
 @Controller()
 export class AuthController {

@@ -1,5 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { User } from '../entities/user';
 import bcrypt from 'bcrypt';
 import moment from 'moment';
@@ -20,12 +19,10 @@ export class AuthService {
 
     data.password = bcrypt.hashSync(data.password, 8);
 
-    const user = await User.save(data).catch(() => {
-      Logger.warn('Register user on DB fail!');
+    return await User.save(data).catch(err => {
+      Logger.error('Register user on DB fail!', err);
       throw new BadRequestException();
     });
-
-    return user;
   }
 
   async login(authData: { email: string; password: string }) {
@@ -50,14 +47,7 @@ export class AuthService {
       throw new BadRequestException('INVALID_PASSWORD');
     }
 
-    await getConnection()
-      .createQueryBuilder()
-      .update(User)
-      .set({ password: bcrypt.hashSync(newPassword, 8) })
-      .where('userId = :userId', { userId: user.userId })
-      .execute();
-
-    return {}
+    await User.update(user.userId, { password: bcrypt.hashSync(newPassword, 8) });
   }
 
   async verify(email: string, token: string) {
@@ -78,12 +68,7 @@ export class AuthService {
       throw new BadRequestException();
     }
 
-    await getConnection()
-      .createQueryBuilder()
-      .update(User)
-      .set({ activated: true, activationCode: null })
-      .where('userId = :userId', { userId: user.userId })
-      .execute();
+    await User.update(user.userId, { activated: true, activationCode: null });
   }
 
 }
