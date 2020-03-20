@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 
-@Controller('health')
+@Controller('healthz')
 export class HealthController {
 
   @Get()
