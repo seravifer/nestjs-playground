@@ -1,4 +1,4 @@
-import { Controller, Post, Req, HttpCode, Param, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
@@ -33,16 +33,6 @@ export class AuthController {
     };
   }
 
-  @Post('reset_password')
-  @HttpCode(200)
-  async resetPassword(@Param() params: any) {
-    const user = await User.findOne({ userId: params.userId });
-    if (user) {
-      this.emailService.sendVerificationCode(user);
-    }
-    return {};
-  }
-
   @Post('verify_email')
   @HttpCode(200)
   async verifyEmail(@Req() req: Request) {
@@ -50,13 +40,29 @@ export class AuthController {
     return {};
   }
 
-  @Post('new_password')
+  @Post('resend_confirmation_email')
+  @HttpCode(200)
+  async resendConfirmationEmail(@Req() req: Request) {
+    const user = await User.findOne({ email: req.body.email });
+    if (user?.activated == true) throw new BadRequestException('ALREADY_ACTIVATED');
+    if (user) this.emailService.sendVerificationCode(user);
+    return {};
+  }
+
+  @Post('reset_password')
   @HttpCode(200)
   async newPassword(@Req() req: Request) {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       this.emailService.sendRecoveryCode(user);
     }
+    return {};
+  }
+
+  @Post('confirm_reset_password')
+  @HttpCode(200)
+  async chnageresetPassword(@Req() req: Request) {
+    await this.authService.confirmResetPassword(req.body.email, req.body.token, req.body.new_password);
     return {};
   }
 

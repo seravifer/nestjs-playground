@@ -50,6 +50,23 @@ export class AuthService {
     await User.update(user.userId, { password: bcrypt.hashSync(newPassword, 8) });
   }
 
+  async confirmResetPassword(email: string, token: string, newPassword: string) {
+    if (!email || !token || !newPassword) {
+      throw new BadRequestException('REQUIRED_FIELDS');
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new BadRequestException();
+    }
+
+    if (user.activationCode !== token) {
+      throw new BadRequestException('INVALID_TOKEN');
+    }
+
+    await User.update(user.userId, { activationCode: null, password: bcrypt.hashSync(newPassword, 8) });
+  }
+
   async verify(email: string, token: string) {
     if (!email || !token) {
       throw new BadRequestException();
