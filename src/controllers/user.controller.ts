@@ -14,9 +14,10 @@ export class UserController {
     return {
       firstName: user.firstName,
       lastName: user.lastName,
+      email: user.email,
       birthdate: user.birthdate,
-      phone: user.phone,
-      email: user.email
+      prefixPhone: user.prefixPhone,
+      phone: user.phone
     };
   }
 }
