@@ -14,7 +14,7 @@ export class AuthService {
     const isValidDate = moment(data.birthdate, 'DD/MM/YYYY').isValid();
     if (!isValidDate) throw new BadRequestException('INVALID_DATE');
 
-    const exist = await User.findOne({ email: data.email });
+    const exist = await User.findOne({ email: data.email }, { select: ['id'] });
     if (exist) throw new BadRequestException('USER_ALREADY_EXIST');
 
     data.password = bcrypt.hashSync(data.password, 8);
