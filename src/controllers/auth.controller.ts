@@ -43,7 +43,7 @@ export class AuthController {
   @Post('resend_confirmation_email')
   @HttpCode(200)
   async resendConfirmationEmail(@Req() req: Request) {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email }, { select: ['id', 'activated', 'email'] });
     if (user?.activated == true) throw new BadRequestException('ALREADY_ACTIVATED');
     if (user) this.emailService.sendVerificationCode(user);
     return {};
@@ -52,7 +52,7 @@ export class AuthController {
   @Post('reset_password')
   @HttpCode(200)
   async newPassword(@Req() req: Request) {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email }, { select: ['id', 'email'] });
     if (user) {
       this.emailService.sendRecoveryCode(user);
     }
@@ -71,7 +71,7 @@ export class AuthController {
   @HttpCode(200)
   async refreshToken(@Req() req: Request) {
     return {
-      token: this.jwtService.sign({ userId: (req.user as User).userId })
+      token: this.jwtService.sign({ userId: (req.user as User).id })
     };
   }
 

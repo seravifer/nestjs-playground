@@ -4,7 +4,7 @@ import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm';
 export class User extends BaseEntity {
   
   @PrimaryGeneratedColumn('uuid')
-  userId: string;
+  id: string;
 
   @Column('varchar')
   firstName: string;
@@ -14,6 +14,9 @@ export class User extends BaseEntity {
 
   @Column('date')
   birthdate: string;
+
+  @Column('integer')
+  prefixPhone?: number;
 
   @Column('integer')
   phone?: number;

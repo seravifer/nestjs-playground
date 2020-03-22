@@ -32,7 +32,7 @@ export class AuthService {
 
     const user = await User.findOne({ email: authData.email });
     if (user && bcrypt.compareSync(authData.password, user.password)) {
-      return user.userId;
+      return user.id;
     }
 
     throw new BadRequestException('AUTHENTICATION_FAIL');
@@ -47,7 +47,7 @@ export class AuthService {
       throw new BadRequestException('INVALID_PASSWORD');
     }
 
-    await User.update(user.userId, { password: bcrypt.hashSync(newPassword, 8) });
+    await User.update(user.id, { password: bcrypt.hashSync(newPassword, 8) });
   }
 
   async confirmResetPassword(email: string, token: string, newPassword: string) {
@@ -64,7 +64,7 @@ export class AuthService {
       throw new BadRequestException('INVALID_TOKEN');
     }
 
-    await User.update(user.userId, { activationCode: null, password: bcrypt.hashSync(newPassword, 8) });
+    await User.update(user.id, { activationCode: null, password: bcrypt.hashSync(newPassword, 8) });
   }
 
   async verify(email: string, token: string) {
@@ -85,7 +85,7 @@ export class AuthService {
       throw new BadRequestException();
     }
 
-    await User.update(user.userId, { activated: true, activationCode: null });
+    await User.update(user.id, { activated: true, activationCode: null });
   }
 
 }

@@ -26,7 +26,7 @@ export class EmailService {
     const emailToken = v4();
     Logger.log(`User token is: ${emailToken}`);
     // Save email token
-    await User.update(user.userId, { activationCode: emailToken });
+    await User.update(user.id, { activationCode: emailToken });
     // Send email
     await this.sendMail({
       to: user.email,
@@ -41,7 +41,7 @@ export class EmailService {
     const emailToken = v4();
     Logger.log(`User token is: ${emailToken}`);
     // Save email token
-    await User.update(user.userId, { activationCode: emailToken });
+    await User.update(user.id, { activationCode: emailToken });
     // Send email
     await this.sendMail({
       to: user.email,
