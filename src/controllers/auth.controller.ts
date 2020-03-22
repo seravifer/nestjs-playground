@@ -20,7 +20,6 @@ export class AuthController {
   async create(@Req() req: Request) {
     const user = await this.authService.register(req.body);
     this.emailService.sendVerificationCode(user);
-    return {};
   }
 
   @Post('login')
@@ -37,7 +36,6 @@ export class AuthController {
   @HttpCode(200)
   async verifyEmail(@Req() req: Request) {
     await this.authService.verify(req.body.email, req.body.token);
-    return {};
   }
 
   @Post('resend_confirmation_email')
@@ -46,24 +44,19 @@ export class AuthController {
     const user = await User.findOne({ email: req.body.email }, { select: ['id', 'activated', 'email'] });
     if (user?.activated == true) throw new BadRequestException('ALREADY_ACTIVATED');
     if (user) this.emailService.sendVerificationCode(user);
-    return {};
   }
 
   @Post('reset_password')
   @HttpCode(200)
   async newPassword(@Req() req: Request) {
     const user = await User.findOne({ email: req.body.email }, { select: ['id', 'email'] });
-    if (user) {
-      this.emailService.sendRecoveryCode(user);
-    }
-    return {};
+    if (user) this.emailService.sendRecoveryCode(user);
   }
 
   @Post('confirm_reset_password')
   @HttpCode(200)
   async chnageresetPassword(@Req() req: Request) {
     await this.authService.confirmResetPassword(req.body.email, req.body.token, req.body.new_password);
-    return {};
   }
 
   @UseGuards(AuthGuard())
@@ -84,7 +77,5 @@ export class AuthController {
       req.body.new_password,
       req.user as User
     );
-
-    return {};
   }
 }

@@ -7,7 +7,7 @@ import { User } from '../entities/user';
 @UseGuards(AuthGuard())
 export class UserController {
 
-  @Get('me')
+  @Get('profile')
   @HttpCode(200)
   authenticate(@Req() req: Request) {
     const user = req.user as User;
