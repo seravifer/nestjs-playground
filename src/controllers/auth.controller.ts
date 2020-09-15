@@ -1,5 +1,5 @@
-import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
@@ -17,19 +17,26 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
-  async create(@Req() req: Request) {
+  async register(@Req() req: Request) {
     const user = await this.authService.register(req.body);
     this.emailService.sendVerificationCode(user);
   }
 
   @Post('login')
   @HttpCode(200)
-  async authenticate(@Req() req: Request) {
+  async login(@Req() req: Request, @Res() res: Response) {
     const userId = await this.authService.login(req.body);
-    return {
-      userId: userId,
-      token: this.jwtService.sign({ userId })
-    };
+    const token = this.jwtService.sign({ userId });
+    res.cookie('authentication', token, { httpOnly: true })
+
+    return res.send({ userId, token });
+  }
+  
+  @Post('logout')
+  @HttpCode(200)
+  async logout(@Req() req: Request, @Res() res: Response) {
+    res.clearCookie('authentication')
+    return res.send();
   }
 
   @Post('verify_email')

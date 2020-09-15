@@ -13,7 +13,7 @@ import { HealthController } from './controllers/health.controller';
 @Module({
   imports: [
     TypeOrmModule.forRoot(config.database),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule.register({ defaultStrategy: 'jwt', property: 'user' }),
     JwtModule.register(config.jwt),
     Logger
   ],

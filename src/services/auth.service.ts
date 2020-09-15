@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { User } from '../entities/user';
 import bcrypt from 'bcrypt';
-import moment from 'moment';
+import { isValid } from 'date-fns';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
     const exist = await User.findOne({ email: data.email }, { select: ['id'] });
     if (exist) throw new BadRequestException('USER_ALREADY_EXIST');
 
-    const isValidDate = moment(data.birthdate, 'DD/MM/YYYY').isValid();
+    const isValidDate = isValid(data.birthdate);
     if (!isValidDate) throw new BadRequestException('INVALID_DATE');
 
     data.password = bcrypt.hashSync(data.password, 8);
