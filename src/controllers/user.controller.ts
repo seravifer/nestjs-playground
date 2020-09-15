@@ -1,6 +1,7 @@
 import { Controller, Req, Get, UseGuards, HttpCode } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from '../entities/user';
 
 @Controller('user')
 @UseGuards(AuthGuard())
@@ -8,8 +9,8 @@ export class UserController {
 
   @Get('me')
   @HttpCode(200)
-  authenticate(@Req() req: Request) {
-    const user = req.user;
+  async authenticate(@Req() req: Request) {
+    const user = await User.findOne(req.user.userId);
     return {
       firstName: user.firstName,
       lastName: user.lastName,

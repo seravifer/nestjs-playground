@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
+import { addDays } from 'date-fns';
 
 @Controller()
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
   async login(@Req() req: Request, @Res() res: Response) {
     const userId = await this.authService.login(req.body);
     const token = this.jwtService.sign({ userId });
-    res.cookie('authentication', token, { httpOnly: true })
+    res.cookie('authentication', token, { httpOnly: true, expires: addDays(new Date(), 7) })
 
     return res.send({ userId, token });
   }
@@ -66,23 +67,24 @@ export class AuthController {
     await this.authService.confirmResetPassword(req.body.email, req.body.token, req.body.new_password);
   }
 
-  @UseGuards(AuthGuard())
   @Get('refresh_token')
+  @UseGuards(AuthGuard())
   @HttpCode(200)
   async refreshToken(@Req() req: Request) {
     return {
-      token: this.jwtService.sign({ userId: (req.user as User).id })
+      token: this.jwtService.sign({ userId: req.user.userId })
     };
   }
 
-  @UseGuards(AuthGuard())
   @Get('change_password')
+  @UseGuards(AuthGuard())
   @HttpCode(200)
   async changePassword(@Req() req: Request) {
+    const user = await User.findOne(req.user.userId, { select: ['id', 'password'] });
     await this.authService.changePassword(
       req.body.old_password,
       req.body.new_password,
-      req.user as User
+      user
     );
   }
 }

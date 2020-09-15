@@ -55,7 +55,7 @@ export class AuthService {
       throw new BadRequestException('REQUIRED_FIELDS');
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }, { select: ['id', 'activated', 'activationCode'] });
     if (!user) {
       throw new BadRequestException();
     }
@@ -72,7 +72,7 @@ export class AuthService {
       throw new BadRequestException();
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }, { select: ['id', 'activated', 'activationCode'] });
     if (!user) {
       throw new BadRequestException();
     }

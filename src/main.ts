@@ -17,6 +17,8 @@ bootstrap();
 // Workaround type https://github.com/DefinitelyTyped/DefinitelyTyped/issues/23976
 declare global {
   namespace Express {
-      interface User extends CustomUser {}
+      interface User {
+        userId: string;
+      }
   }
 }
