@@ -26,8 +26,7 @@ export const config: Config = {
   port: +process.env.PORT || 3000,
   database: {
     type: 'postgres',
-    url: process.env.DATABASE_URL,
-    host: process.env.DB_HOST ?? 'localhosdeet',
+    host: process.env.DB_HOST ?? 'localhost',
     port: +process.env.DB_PORT || 5432,
     username: process.env.DB_USER ?? 'postgres',
     password: process.env.DB_PASS ?? 'pass',
