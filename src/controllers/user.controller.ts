@@ -1,4 +1,4 @@
-import { Controller, Req, Get, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Req, Get, UseGuards, HttpCode, Put, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
@@ -7,17 +7,20 @@ import { User } from '../entities/user';
 @UseGuards(AuthGuard())
 export class UserController {
 
-  @Get('me')
+  @Get()
   @HttpCode(200)
-  async authenticate(@Req() req: Request) {
-    const user = await User.findOne(req.user.userId);
-    return {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      birthdate: user.birthdate,
-      prefixPhone: user.prefixPhone,
-      phone: user.phone
-    };
+  async getUser(@Req() req: Request) {
+    return User.findOne(req.user.userId,
+      { select: ['id', 'firstName', 'lastName', 'email', 'birthdate', 'prefixPhone', 'phone'] });
   }
+
+  @Put()
+  @HttpCode(200)
+  async updateUser(@Req() req: Request) {    
+    // TODO: validate with class-validator
+    const user = User.findOne(req.user.userId, { select: ['id']});
+    if (!user) return new BadRequestException('USER_NOT_FOUND');
+    await User.update(req.user.userId, req.body);
+  }
+
 }

@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "8ab450e5-a59d-4fc7-9eca-8bd5060a8184",
-		"name": "Backend test",
+		"name": "Server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,7 +9,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "/register",
+					"name": "/signup",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -22,17 +22,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"firstName\": \"name\",\n\t\"lastName\": \"lastname\",\n\t\"birthdate\": \"10/10/2019\",\n\t\"email\": \"prueba2@gmail.com\",\n\t\"password\": \"pass\"\n}"
+							"raw": "{\n\t\"firstName\": \"name\",\n\t\"lastName\": \"lastname\",\n\t\"birthdate\": \"10/10/2019\",\n\t\"email\": \"prueba3@gmail.com\",\n\t\"password\": \"pass\"\n}"
 						},
 						"url": {
-							"raw": "localhost:3000/api/register",
+							"raw": "localhost:3000/api/signup",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"api",
-								"register"
+								"signup"
 							]
 						}
 					},
@@ -47,7 +47,7 @@
 								"id": "bc0834a1-35b5-4643-9512-9ae3bf0ffcf8",
 								"exec": [
 									"var jsonData = JSON.parse(responseBody);",
-									"pm.collectionVariables.set(\"jwt\", jsonData.token);"
+									"pm.collectionVariables.set(\"jwt\", jsonData.accessToken);"
 								],
 								"type": "text/javascript"
 							}
@@ -76,6 +76,49 @@
 							"path": [
 								"api",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fe57bd56-8024-43bc-b077-e26115142e56",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"// pm.collectionVariables.set(\"jwt\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"prueba1@gmail.com\",\n\t\"password\": \"pass\"\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/api/logout",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"logout"
 							]
 						}
 					},
@@ -253,7 +296,7 @@
 			"name": "User",
 			"item": [
 				{
-					"name": "/me",
+					"name": "/user",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -271,15 +314,48 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "localhost:3000/api/user/me",
+							"raw": "localhost:3000/api/user",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"api",
-								"user",
-								"me"
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/user",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"name\",\r\n    \"lastName\": \"lastname\",\r\n    \"email\": \"prueba1@gmail.com\",\r\n    \"birthdate\": \"2019-10-10\",\r\n    \"phone\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/user",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"user"
 							]
 						}
 					},
@@ -332,10 +408,9 @@
 	],
 	"variable": [
 		{
-			"id": "ec4081ec-0e4d-48f5-bbb6-60c886fdace2",
+			"id": "85e1cd12-e374-4e2c-815e-2a6cf0269d2e",
 			"key": "jwt",
-			"value": "",
-			"type": "string"
+			"value": ""
 		}
 	],
 	"protocolProfileBehavior": {}
