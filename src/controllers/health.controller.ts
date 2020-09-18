@@ -5,7 +5,7 @@ import { getConnection } from 'typeorm';
 export class HealthController {
 
   @Get()
-  async checkHealth() {
+  async healthz() {
     let dbStatus: boolean;
     try {
       await getConnection().query('SELECT 1');

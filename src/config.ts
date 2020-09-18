@@ -1,5 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { JwtModuleOptions } from '@nestjs/jwt';
 
 interface Config {
   projectName: string;
@@ -14,7 +13,11 @@ interface Config {
     pass: string;
     mail: string;
   };
-  jwt: JwtModuleOptions;
+  jwt: {
+    secret: string;
+    refreshTokenExpiration: number;
+    accessTokenExpiration: number;
+  };
 }
 
 export const config: Config = {
@@ -39,9 +42,8 @@ export const config: Config = {
     mail: 'noreply@mail.com'
   },
   jwt: {
-    secret: 'secret',
-    signOptions: {
-      expiresIn: 3600,
-    }
+    secret: 'secret', // FIXME: use env
+    refreshTokenExpiration: 3600,
+    accessTokenExpiration: 3600
   }
 };

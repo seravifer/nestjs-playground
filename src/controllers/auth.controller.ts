@@ -6,6 +6,7 @@ import { EmailService } from '../services/email.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
 import { addDays } from 'date-fns';
+import { config } from 'src/config';
 
 @Controller()
 export class AuthController {
@@ -16,7 +17,7 @@ export class AuthController {
     private readonly jwtService: JwtService
   ) { }
 
-  @Post('register')
+  @Post('signup')
   @HttpCode(201)
   async register(@Req() req: Request) {
     const user = await this.authService.register(req.body);
@@ -27,16 +28,16 @@ export class AuthController {
   @HttpCode(200)
   async login(@Req() req: Request, @Res() res: Response) {
     const userId = await this.authService.login(req.body);
-    const token = this.jwtService.sign({ userId });
-    res.cookie('authentication', token, { httpOnly: true, expires: addDays(new Date(), 7) })
-
-    return res.send({ userId, token });
+    const refreshToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.accessTokenExpiration });
+    res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
+    return res.send({ userId, refreshToken, accessToken });
   }
   
   @Post('logout')
   @HttpCode(200)
   async logout(@Req() req: Request, @Res() res: Response) {
-    res.clearCookie('authentication')
+    res.clearCookie('authentication');
     return res.send();
   }
 
@@ -70,10 +71,11 @@ export class AuthController {
   @Get('refresh_token')
   @UseGuards(AuthGuard())
   @HttpCode(200)
-  async refreshToken(@Req() req: Request) {
-    return {
-      token: this.jwtService.sign({ userId: req.user.userId })
-    };
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = this.jwtService.sign({ userId: req.user.userId }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId: req.user.userId }, { expiresIn: config.jwt.accessTokenExpiration });
+    res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
+    return res.send({ refreshToken, accessToken });
   }
 
   @Get('change_password')
