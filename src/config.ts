@@ -15,8 +15,8 @@ interface Config {
   };
   jwt: {
     secret: string;
-    refreshTokenExpiration: number;
-    accessTokenExpiration: number;
+    refreshTokenExpiration: number | string;
+    accessTokenExpiration: number | string;
   };
 }
 
@@ -26,24 +26,24 @@ export const config: Config = {
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'pass',
-    database: 'db',
+    host: process.env.DB_HOST ?? 'localhost',
+    port: parseInt(process.env.DB_PORT, 10) || 5432,
+    username: process.env.DB_USER ?? 'postgres',
+    password: process.env.DB_PASS ?? 'pass',
+    database: process.env.DB_NAME ?? 'db',
     entities: ['dist/entities/*{.ts,.js}'],
   },
   smtp: {
-    host: 'localhost',
-    port: 1025,
-    secure: false,
-    user: 'project.1',
-    pass: 'secret.1',
-    mail: 'noreply@mail.com'
+    host: process.env.SMTP_HOST ?? 'localhost',
+    port: parseInt(process.env.SMTP_PORT, 10) || 1025,
+    secure: (process.env.SMTP_SECURE === 'true') ?? false,
+    user: process.env.SMTP_USER ?? 'project.1',
+    pass: process.env.SMTP_PASS ?? 'secret.1',
+    mail: process.env.SMTP_MAIL ?? 'noreply@mail.com'
   },
   jwt: {
-    secret: 'secret', // FIXME: use env
-    refreshTokenExpiration: 3600,
-    accessTokenExpiration: 3600
+    secret: process.env.JWT_SECRET ?? 'secret',
+    refreshTokenExpiration: '7d',
+    accessTokenExpiration: '6h'
   }
 };
