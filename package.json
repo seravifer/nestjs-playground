@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "author": "Sergi Ávila",
   "license": "MIT",
+  "main": "dist/main.js",
   "engines": {
-    "node": "14"
+    "node": "14.x"
   },
   "scripts": {
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
     "build": "nest build",
     "clean": "rimraf dist",
     "lint": "eslint './src/**/*.ts' --fix",
