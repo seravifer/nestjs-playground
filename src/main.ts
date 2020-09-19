@@ -1,4 +1,4 @@
-import { config } from '@config';
+import { config } from './config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';

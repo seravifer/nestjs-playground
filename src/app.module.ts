@@ -6,7 +6,7 @@ import { JwtStrategy } from './middleware/jwt.strategy';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { UserController } from './controllers/user.controller';
-import { config } from '@config';
+import { config } from './config';
 import { EmailService } from './services/email.service';
 import { HealthController } from './controllers/health.controller';
 

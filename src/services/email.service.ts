@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { createTransport, SendMailOptions } from 'nodemailer';
 import { User } from '../entities/user';
-import { config } from '@config';
+import { config } from '../config';
 import { v4 } from 'uuid';
 
 @Injectable()

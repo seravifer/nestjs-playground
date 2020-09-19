@@ -10,10 +10,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "esModuleInterop": true,
-    "incremental": true,
-    "paths": {
-      "@config": ["src/config.ts"]
-    }
+    "incremental": true
   },
   "exclude": ["node_modules", "dist"]
 }
