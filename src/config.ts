@@ -1,3 +1,4 @@
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 interface Config {
@@ -18,6 +19,7 @@ interface Config {
     refreshTokenExpiration: number | string;
     accessTokenExpiration: number | string;
   };
+  cors: CorsOptions;
 }
 
 export const config: Config = {
@@ -45,5 +47,9 @@ export const config: Config = {
     secret: process.env.JWT_SECRET ?? 'secret',
     refreshTokenExpiration: '7d',
     accessTokenExpiration: '6h'
+  },
+  cors: {
+    origin: process.env.CORS_ORIGIN ?? '*',
+    credentials: true
   }
 };

@@ -1,13 +1,13 @@
+import { config } from '@config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { config } from './config';
 import cookieParser from 'cookie-parser';
 import  csurf from 'csurf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.enableCors();
+  app.enableCors(config.cors);
   app.use(cookieParser());
   // TODO: app.use(csurf());
   // TODO: add rate limiter

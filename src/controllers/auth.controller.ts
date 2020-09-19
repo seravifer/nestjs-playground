@@ -6,7 +6,7 @@ import { EmailService } from '../services/email.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
 import { addDays } from 'date-fns';
-import { config } from 'src/config';
+import { config } from '@config';
 
 @Controller()
 export class AuthController {
