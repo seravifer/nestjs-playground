@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { User } from '../entities/user';
-import bcrypt from 'bcrypt';
 import { isValid } from 'date-fns';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
