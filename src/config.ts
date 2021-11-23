@@ -31,8 +31,8 @@ export const config: Config = {
     host: process.env.DB_HOST ?? 'localhost',
     port: +process.env.DB_PORT || 5432,
     username: process.env.DB_USER ?? 'postgres',
-    password: process.env.DB_PASS ?? 'pass',
-    database: process.env.DB_NAME ?? 'db',
+    password: process.env.DB_PASS ?? '123456',
+    database: process.env.DB_NAME ?? 'demo',
     entities: ['dist/entities/*{.ts,.js}'],
   },
   smtp: {

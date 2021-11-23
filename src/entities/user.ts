@@ -1,5 +1,4 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { IsString } from 'class-validator';
 
 @Entity('user')
 export class User extends BaseEntity {
@@ -8,7 +7,6 @@ export class User extends BaseEntity {
   id: string;
 
   @Column('varchar')
-  @IsString()
   firstName: string;
 
   @Column('varchar')
