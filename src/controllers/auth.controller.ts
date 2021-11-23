@@ -1,12 +1,12 @@
-import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException, Res } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException, Res, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../services/email.service';
-import { AuthGuard } from '@nestjs/passport';
 import { User } from '../entities/user';
 import { addDays } from 'date-fns';
 import { config } from '../config';
+import { AuthGuard, UserId } from 'src/utils/auth.guard';
 
 @Controller()
 export class AuthController {
@@ -69,23 +69,23 @@ export class AuthController {
   }
 
   @Get('refresh_token')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard)
   @HttpCode(200)
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = this.jwtService.sign({ userId: req.user?.userId }, { expiresIn: config.jwt.refreshTokenExpiration });
-    const accessToken = this.jwtService.sign({ userId: req.user?.userId }, { expiresIn: config.jwt.accessTokenExpiration });
+  async refreshToken(@UserId() userId: string, @Res() res: Response) {
+    const refreshToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.accessTokenExpiration });
     res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
     return res.send({ refreshToken, accessToken });
   }
 
   @Get('change_password')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard)
   @HttpCode(200)
-  async changePassword(@Req() req: Request) {
-    const user = await User.findOne(req.user?.userId, { select: ['id', 'password'] });
+  async changePassword(@Body() body: any, @UserId() userId: string) {
+    const user = await User.findOne(userId, { select: ['id', 'password'] });
     await this.authService.changePassword(
-      req.body.old_password,
-      req.body.new_password,
+      body.old_password,
+      body.new_password,
       user!
     );
   }
