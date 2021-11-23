@@ -25,11 +25,11 @@ interface Config {
 export const config: Config = {
   projectName: 'Server Test',
   version: 1,
-  port: +process.env.PORT || 3000,
+  port: Number(process.env.PORT ?? 3000),
   database: {
     type: 'postgres',
     host: process.env.DB_HOST ?? 'localhost',
-    port: +process.env.DB_PORT || 5432,
+    port: Number(process.env.DB_PORT ?? 5432),
     username: process.env.DB_USER ?? 'postgres',
     password: process.env.DB_PASS ?? '123456',
     database: process.env.DB_NAME ?? 'demo',
@@ -37,7 +37,7 @@ export const config: Config = {
   },
   smtp: {
     host: process.env.SMTP_HOST ?? 'localhost',
-    port: +process.env.SMTP_PORT || 1025,
+    port: Number(process.env.SMTP_PORT ?? 1025),
     secure: (process.env.SMTP_SECURE === 'true') ?? false,
     user: process.env.SMTP_USER ?? 'project.1',
     pass: process.env.SMTP_PASS ?? 'secret.1',

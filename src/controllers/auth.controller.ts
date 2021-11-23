@@ -72,8 +72,8 @@ export class AuthController {
   @UseGuards(AuthGuard())
   @HttpCode(200)
   async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = this.jwtService.sign({ userId: req.user.userId }, { expiresIn: config.jwt.refreshTokenExpiration });
-    const accessToken = this.jwtService.sign({ userId: req.user.userId }, { expiresIn: config.jwt.accessTokenExpiration });
+    const refreshToken = this.jwtService.sign({ userId: req.user?.userId }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId: req.user?.userId }, { expiresIn: config.jwt.accessTokenExpiration });
     res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
     return res.send({ refreshToken, accessToken });
   }
@@ -82,11 +82,11 @@ export class AuthController {
   @UseGuards(AuthGuard())
   @HttpCode(200)
   async changePassword(@Req() req: Request) {
-    const user = await User.findOne(req.user.userId, { select: ['id', 'password'] });
+    const user = await User.findOne(req.user?.userId, { select: ['id', 'password'] });
     await this.authService.changePassword(
       req.body.old_password,
       req.body.new_password,
-      user
+      user!
     );
   }
 }

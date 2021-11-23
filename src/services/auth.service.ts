@@ -64,7 +64,7 @@ export class AuthService {
       throw new BadRequestException('INVALID_TOKEN');
     }
 
-    await User.update(user.id, { activationCode: null, password: bcrypt.hashSync(newPassword, 8) });
+    await User.update(user.id, { activationCode: undefined, password: bcrypt.hashSync(newPassword, 8) });
   }
 
   async verify(email: string, token: string) {
@@ -85,7 +85,7 @@ export class AuthService {
       throw new BadRequestException();
     }
 
-    await User.update(user.id, { activated: true, activationCode: null });
+    await User.update(user.id, { activated: true, activationCode: undefined });
   }
 
 }

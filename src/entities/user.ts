@@ -1,36 +1,44 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@Entity('user')
-export class User extends BaseEntity {
-  
-  @PrimaryGeneratedColumn('uuid')
+export interface IUser {
   id: string;
-
-  @Column('varchar')
   firstName: string;
-
-  @Column('varchar')
   lastName: string;
+  birthdate?: string;
+  prefixPhone?: number;
+  phone?: number;
+  email: string;
+}
 
-  @Column('date')
-  birthdate: string;
+@Entity("user")
+export class User extends BaseEntity {
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-  @Column('integer')
+  @Column("varchar")
+  firstName!: string;
+
+  @Column("varchar")
+  lastName!: string;
+
+  @Column("date")
+  birthdate!: string;
+
+  @Column("integer")
   prefixPhone?: number;
 
-  @Column('integer')
+  @Column("integer")
   phone?: number;
 
-  @Column('varchar')
-  password: string;
+  @Column("varchar")
+  password!: string;
 
-  @Column('boolean')
-  activated: boolean;
+  @Column("boolean")
+  activated!: boolean;
 
-  @Column('varchar')
-  email: string;
+  @Column("varchar")
+  email!: string;
 
-  @Column('uuid')
+  @Column("uuid")
   activationCode?: string;
-
 }
