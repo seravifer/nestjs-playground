@@ -1,4 +1,4 @@
-import { IUser } from "./../entities/user";
+import { IUser } from "./user.model";
 import { JSONSchemaType } from "ajv";
 
 export const userSchema: JSONSchemaType<IUser> = {

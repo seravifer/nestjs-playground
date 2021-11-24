@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { createTransport, SendMailOptions } from 'nodemailer';
-import { User } from '../entities/user';
+import { User } from '../entities/user.entity';
 import { config } from '../config';
 import { v4 } from 'uuid';
 

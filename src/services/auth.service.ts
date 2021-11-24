@@ -1,16 +1,13 @@
+import { ISignup } from './../controllers/auth/auth.model';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import { User } from '../entities/user';
+import { User } from '../entities/user.entity';
 import { isValid, parse } from 'date-fns';
 import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
 
-  async register(data: any) {
-    if (!data.firstName || !data.lastName || !data.birthdate || !data.password || !data.email) {
-      throw new BadRequestException('REQUIRED');
-    }
-
+  async register(data: ISignup) {
     const exist = await User.findOne({ email: data.email }, { select: ['id'] });
     if (exist) throw new BadRequestException('USER_ALREADY_EXIST');
 
@@ -19,7 +16,7 @@ export class AuthService {
 
     data.password = bcrypt.hashSync(data.password, 8);
 
-    return await User.save(data).catch(err => {
+    return await User.save(data as any).catch(err => {
       Logger.error('Register user on DB fail!', err);
       throw new BadRequestException();
     });
@@ -38,7 +35,13 @@ export class AuthService {
     throw new BadRequestException('AUTHENTICATION_FAIL');
   }
 
-  async changePassword(oldPassword: string, newPassword: string, user: User) {
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    const user = await User.findOne(userId, { select: ['id', 'password'] });
+
+    if (!user) {
+      throw new BadRequestException();
+    }
+
     if (oldPassword == newPassword) {
       throw new BadRequestException('SAME_PASSWORD');
     }

@@ -1,15 +1,5 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-export interface IUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  birthdate?: string;
-  prefixPhone?: number;
-  phone?: number;
-  email: string;
-}
-
 @Entity("user")
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")

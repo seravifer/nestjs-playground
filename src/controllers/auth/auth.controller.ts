@@ -1,12 +1,15 @@
-import { Controller, Post, Req, HttpCode, Get, UseGuards, BadRequestException, Res, Body } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { EmailService } from '../services/email.service';
-import { User } from '../entities/user';
 import { addDays } from 'date-fns';
-import { config } from '../config';
+import { Response } from 'express';
 import { AuthGuard, UserId } from 'src/utils/auth.guard';
+import { config } from '../../config';
+import { User } from '../../entities/user.entity';
+import { AuthService } from '../../services/auth.service';
+import { EmailService } from '../../services/email.service';
+import { Validate } from '../../utils/validator.pipe';
+import { IChangePassword, IConfirmResetPassword, ILogin, IResetPassword, ISignup, IVerifyEmail } from './auth.model';
+import { changePasswordSchema, confirmResetPasswordSchema, resetPasswordSchema, signupSchema, verifyEmailSchema } from './auth.schema';
 
 @Controller()
 export class AuthController {
@@ -18,16 +21,18 @@ export class AuthController {
   ) { }
 
   @Post('signup')
-  @HttpCode(201)
-  async register(@Req() req: Request) {
-    const user = await this.authService.register(req.body);
+  @HttpCode(200)
+  @Validate(signupSchema)
+  async register(@Body() body: ISignup) {
+    const user = await this.authService.register(body);
     this.emailService.sendVerificationCode(user);
   }
 
   @Post('login')
   @HttpCode(200)
-  async login(@Req() req: Request, @Res() res: Response) {
-    const userId = await this.authService.login(req.body);
+  @Validate(signupSchema)
+  async login(@Body() body: ILogin, @Res() res: Response) {
+    const userId = await this.authService.login(body);
     const refreshToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.refreshTokenExpiration });
     const accessToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.accessTokenExpiration });
     res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
@@ -36,41 +41,45 @@ export class AuthController {
   
   @Post('logout')
   @HttpCode(200)
-  async logout(@Req() req: Request, @Res() res: Response) {
+  async logout(@Res() res: Response) {
     res.clearCookie('authentication');
     return res.send();
   }
 
   @Post('verify_email')
   @HttpCode(200)
-  async verifyEmail(@Req() req: Request) {
-    await this.authService.verify(req.body.email, req.body.token);
+  @Validate(verifyEmailSchema)
+  async verifyEmail(@Body() body: IVerifyEmail) {
+    await this.authService.verify(body.email, body.token);
   }
 
   @Post('resend_confirmation_email')
   @HttpCode(200)
-  async resendConfirmationEmail(@Req() req: Request) {
-    const user = await User.findOne({ email: req.body.email }, { select: ['id', 'activated', 'email'] });
+  @Validate(resetPasswordSchema)
+  async resendConfirmationEmail(@Body() body: IResetPassword) {
+    const user = await User.findOne({ email: body.email }, { select: ['id', 'activated', 'email'] });
     if (user?.activated == true) throw new BadRequestException('ALREADY_ACTIVATED');
     if (user) this.emailService.sendVerificationCode(user);
   }
 
   @Post('reset_password')
   @HttpCode(200)
-  async newPassword(@Req() req: Request) {
-    const user = await User.findOne({ email: req.body.email }, { select: ['id', 'email'] });
+  @Validate(resetPasswordSchema)
+  async resetPassword(@Body() body: IResetPassword) {
+    const user = await User.findOne({ email: body.email }, { select: ['id', 'email'] });
     if (user) this.emailService.sendRecoveryCode(user);
   }
 
   @Post('confirm_reset_password')
   @HttpCode(200)
-  async chnageresetPassword(@Req() req: Request) {
-    await this.authService.confirmResetPassword(req.body.email, req.body.token, req.body.new_password);
+  @Validate(confirmResetPasswordSchema)
+  async confirmResetPassword(@Body() body: IConfirmResetPassword) {
+    await this.authService.confirmResetPassword(body.email, body.token, body.newPassword);
   }
 
   @Get('refresh_token')
-  @UseGuards(AuthGuard)
   @HttpCode(200)
+  @UseGuards(AuthGuard)
   async refreshToken(@UserId() userId: string, @Res() res: Response) {
     const refreshToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.refreshTokenExpiration });
     const accessToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.accessTokenExpiration });
@@ -81,12 +90,12 @@ export class AuthController {
   @Get('change_password')
   @UseGuards(AuthGuard)
   @HttpCode(200)
-  async changePassword(@Body() body: any, @UserId() userId: string) {
-    const user = await User.findOne(userId, { select: ['id', 'password'] });
+  @Validate(changePasswordSchema)
+  async changePassword(@UserId() userId: string, @Body() body: IChangePassword) {
     await this.authService.changePassword(
-      body.old_password,
-      body.new_password,
-      user!
+      userId,
+      body.oldPassword,
+      body.newPassword
     );
   }
 }

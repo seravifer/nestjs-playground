@@ -1,6 +1,6 @@
-import { AuthGuard, UserId } from './../utils/auth.guard';
-import { userSchema } from "./../schemas/user.schema";
-import { Validate } from "../utils/validator.pipe";
+import { AuthGuard, UserId } from '../../utils/auth.guard';
+import { userSchema } from "./user.schema";
+import { Validate } from "../../utils/validator.pipe";
 import {
   Controller,
   Get,
@@ -9,7 +9,8 @@ import {
   BadRequestException,
   Body,
 } from "@nestjs/common";
-import { User } from "../entities/user";
+import { User } from "../../entities/user.entity";
+import { IUser } from './user.model';
 
 @Controller("user")
 @UseGuards(AuthGuard)
@@ -30,7 +31,7 @@ export class UserController {
 
   @Put()
   @Validate(userSchema)
-  async updateUser(@Body() body: any, @UserId() userId: string) {
+  async updateUser(@UserId() userId: string, @Body() body: IUser) {
     const user = await User.findOne(userId, { select: ["id"] });
     if (!user) return new BadRequestException("USER_NOT_FOUND");
     await User.update(user, body);
