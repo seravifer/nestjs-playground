@@ -5,8 +5,10 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import Ajv from "ajv";
+import addFormats from "ajv-formats"
 
 const ajv = new Ajv();
+addFormats(ajv);
 
 @Injectable()
 export class ValidatorPipe implements PipeTransform {

@@ -13,9 +13,11 @@ export const signupSchema: JSONSchemaType<ISignup> = {
     },
     birthdate: {
       type: "string",
+      format: "date",
     },
     email: {
       type: "string",
+      format: "email",
     },
     password: {
       type: "string",

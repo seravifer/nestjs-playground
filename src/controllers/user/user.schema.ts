@@ -18,7 +18,8 @@ export const userSchema: JSONSchemaType<IUser> = {
     },
     birthdate: {
       type: "string",
-      nullable: true
+      nullable: true,
+      format: "date"
     },
     prefixPhone: {
       type: "integer",
@@ -30,7 +31,8 @@ export const userSchema: JSONSchemaType<IUser> = {
     },
     email: {
       type: "string",
-      nullable: true
+      nullable: true,
+      format: "email"
     },
   },
   required: ['id'],
