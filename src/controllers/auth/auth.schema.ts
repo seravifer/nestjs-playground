@@ -1,5 +1,5 @@
 import { JSONSchemaType } from "ajv";
-import { IChangePassword, IConfirmResetPassword, ILogin, IResetPassword, ISignup, IVerifyEmail } from "./auth.model";
+import { IChangePassword, IResetPassword, ILogin, IRecover, ISignup, IVerify } from "./auth.model";
 
 export const signupSchema: JSONSchemaType<ISignup> = {
   $id: "signup",
@@ -42,7 +42,7 @@ export const loginSchema: JSONSchemaType<ILogin> = {
   additionalProperties: false
 };
 
-export const verifyEmailSchema: JSONSchemaType<IVerifyEmail> = {
+export const verifySchema: JSONSchemaType<IVerify> = {
   $id: "login",
   type: "object",
   properties: {
@@ -57,7 +57,7 @@ export const verifyEmailSchema: JSONSchemaType<IVerifyEmail> = {
   additionalProperties: false
 };
 
-export const resetPasswordSchema: JSONSchemaType<IResetPassword> = {
+export const recoverSchema: JSONSchemaType<IRecover> = {
   $id: "resetPassword",
   type: "object",
   properties: {
@@ -69,7 +69,7 @@ export const resetPasswordSchema: JSONSchemaType<IResetPassword> = {
   additionalProperties: false
 };
 
-export const confirmResetPasswordSchema: JSONSchemaType<IConfirmResetPassword> = {
+export const resetPasswordSchema: JSONSchemaType<IResetPassword> = {
   $id: "confirmResetPassword",
   type: "object",
   properties: {

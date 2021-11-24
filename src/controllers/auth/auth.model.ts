@@ -11,16 +11,16 @@ export interface ILogin {
   password: string;
 }
 
-export interface IVerifyEmail {
+export interface IVerify {
   email: string;
   token: string;
 }
 
-export interface IResetPassword {
+export interface IRecover {
   email: string;
 }
 
-export interface IConfirmResetPassword {
+export interface IResetPassword {
   email: string;
   token: string;
   newPassword: string;

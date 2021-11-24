@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { addDays } from 'date-fns';
 import { Response } from 'express';
@@ -8,8 +8,8 @@ import { User } from '../../entities/user.entity';
 import { AuthService } from '../../services/auth.service';
 import { EmailService } from '../../services/email.service';
 import { Validate } from '../../utils/validator.pipe';
-import { IChangePassword, IConfirmResetPassword, ILogin, IResetPassword, ISignup, IVerifyEmail } from './auth.model';
-import { changePasswordSchema, confirmResetPasswordSchema, resetPasswordSchema, signupSchema, verifyEmailSchema } from './auth.schema';
+import { IChangePassword, IResetPassword, ILogin, IRecover, ISignup, IVerify } from './auth.model';
+import { changePasswordSchema, resetPasswordSchema, recoverSchema, signupSchema, verifySchema, loginSchema } from './auth.schema';
 
 @Controller()
 export class AuthController {
@@ -30,13 +30,15 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  @Validate(signupSchema)
+  @Validate(loginSchema)
   async login(@Body() body: ILogin, @Res() res: Response) {
     const userId = await this.authService.login(body);
     const refreshToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.refreshTokenExpiration });
     const accessToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.accessTokenExpiration });
+    const expiresIn = config.jwt.accessTokenExpiration * 1_000;
+    const refreshTokenExpiresIn = config.jwt.refreshTokenExpiration * 1_000;
     res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
-    return res.send({ userId, refreshToken, accessToken });
+    return res.send({ refreshToken, accessToken, expiresIn, refreshTokenExpiresIn });
   }
   
   @Post('logout')
@@ -46,48 +48,48 @@ export class AuthController {
     return res.send();
   }
 
-  @Post('verify_email')
+  @Post('verify')
   @HttpCode(200)
-  @Validate(verifyEmailSchema)
-  async verifyEmail(@Body() body: IVerifyEmail) {
+  @Validate(verifySchema)
+  async verifyEmail(@Body() body: IVerify, @Res() res: Response) {
     await this.authService.verify(body.email, body.token);
+    const user = await User.findOne({ email: body.email }, { select: ['id', 'email'] });
+    const refreshToken = this.jwtService.sign({ userId: user?.id }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId: user?.id }, { expiresIn: config.jwt.accessTokenExpiration });
+    const expiresIn = config.jwt.accessTokenExpiration * 1_000;
+    const refreshTokenExpiresIn = config.jwt.refreshTokenExpiration * 1_000;
+    res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
+    return res.send({ refreshToken, accessToken, expiresIn, refreshTokenExpiresIn });
   }
 
-  @Post('resend_confirmation_email')
+  @Post('recover')
   @HttpCode(200)
-  @Validate(resetPasswordSchema)
-  async resendConfirmationEmail(@Body() body: IResetPassword) {
-    const user = await User.findOne({ email: body.email }, { select: ['id', 'activated', 'email'] });
-    if (user?.activated == true) throw new BadRequestException('ALREADY_ACTIVATED');
-    if (user) this.emailService.sendVerificationCode(user);
-  }
-
-  @Post('reset_password')
-  @HttpCode(200)
-  @Validate(resetPasswordSchema)
-  async resetPassword(@Body() body: IResetPassword) {
+  @Validate(recoverSchema)
+  async recover(@Body() body: IRecover) {
     const user = await User.findOne({ email: body.email }, { select: ['id', 'email'] });
     if (user) this.emailService.sendRecoveryCode(user);
   }
 
-  @Post('confirm_reset_password')
+  @Post('reset')
   @HttpCode(200)
-  @Validate(confirmResetPasswordSchema)
-  async confirmResetPassword(@Body() body: IConfirmResetPassword) {
+  @Validate(resetPasswordSchema)
+  async resetPassword(@Body() body: IResetPassword) {
     await this.authService.confirmResetPassword(body.email, body.token, body.newPassword);
   }
 
-  @Get('refresh_token')
+  @Get('token')
   @HttpCode(200)
   @UseGuards(AuthGuard)
-  async refreshToken(@UserId() userId: string, @Res() res: Response) {
-    const refreshToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.refreshTokenExpiration });
-    const accessToken = this.jwtService.sign({ userId: userId }, { expiresIn: config.jwt.accessTokenExpiration });
+  async token(@UserId() userId: string, @Res() res: Response) {
+    const refreshToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.refreshTokenExpiration });
+    const accessToken = this.jwtService.sign({ userId }, { expiresIn: config.jwt.accessTokenExpiration });
+    const expiresIn = config.jwt.accessTokenExpiration * 1_000;
+    const refreshTokenExpiresIn = config.jwt.refreshTokenExpiration * 1_000;
     res.cookie('authentication', refreshToken, { httpOnly: true, expires: addDays(new Date(), 7) });
-    return res.send({ refreshToken, accessToken });
+    return res.send({ refreshToken, accessToken, expiresIn, refreshTokenExpiresIn });
   }
 
-  @Get('change_password')
+  @Post('password')
   @UseGuards(AuthGuard)
   @HttpCode(200)
   @Validate(changePasswordSchema)

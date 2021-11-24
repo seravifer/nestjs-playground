@@ -16,8 +16,8 @@ interface Config {
   };
   jwt: {
     secret: string;
-    refreshTokenExpiration: number | string;
-    accessTokenExpiration: number | string;
+    refreshTokenExpiration: number;
+    accessTokenExpiration: number;
   };
   cors: CorsOptions;
 }
@@ -45,8 +45,8 @@ export const config: Config = {
   },
   jwt: {
     secret: process.env.JWT_SECRET ?? 'secret',
-    refreshTokenExpiration: '7d',
-    accessTokenExpiration: '6h'
+    refreshTokenExpiration: 60 * 60 * 24 * 7, // 7 days in seconds
+    accessTokenExpiration: 60 * 60 * 6 // 6 hours in seconds
   },
   cors: {
     origin: process.env.CORS_ORIGIN ?? '*',

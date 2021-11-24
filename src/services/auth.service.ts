@@ -1,7 +1,6 @@
 import { ISignup } from './../controllers/auth/auth.model';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { User } from '../entities/user.entity';
-import { isValid, parse } from 'date-fns';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,9 +9,6 @@ export class AuthService {
   async register(data: ISignup) {
     const exist = await User.findOne({ email: data.email }, { select: ['id'] });
     if (exist) throw new BadRequestException('USER_ALREADY_EXIST');
-
-    const birthdate = parse(data.birthdate, 'yyyy-MM-dd', new Date());
-    if (!isValid(birthdate)) throw new BadRequestException('INVALID_DATE');
 
     data.password = bcrypt.hashSync(data.password, 8);
 
@@ -23,10 +19,6 @@ export class AuthService {
   }
 
   async login(authData: { email: string; password: string }) {
-    if (!authData.email || !authData.password) {
-      throw new BadRequestException();
-    }
-
     const user = await User.findOne({ email: authData.email });
     if (user && bcrypt.compareSync(authData.password, user.password)) {
       return user.id;
@@ -54,10 +46,6 @@ export class AuthService {
   }
 
   async confirmResetPassword(email: string, token: string, newPassword: string) {
-    if (!email || !token || !newPassword) {
-      throw new BadRequestException('REQUIRED_FIELDS');
-    }
-
     const user = await User.findOne({ email }, { select: ['id', 'activated', 'activationCode'] });
     if (!user) {
       throw new BadRequestException();
@@ -71,10 +59,6 @@ export class AuthService {
   }
 
   async verify(email: string, token: string) {
-    if (!email || !token) {
-      throw new BadRequestException();
-    }
-
     const user = await User.findOne({ email }, { select: ['id', 'activated', 'activationCode'] });
     if (!user) {
       throw new BadRequestException();
